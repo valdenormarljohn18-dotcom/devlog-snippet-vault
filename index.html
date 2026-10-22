@@ -211,6 +211,7 @@
         <ol class="guide-steps">
           <li><strong>Create an entry</strong><span>Choose <b>New entry</b>, then save a dev log for notes or a code snippet for something you want to reuse.</span></li>
           <li><strong>Try the example webpage</strong><span>Open “Example: Simple welcome page” below, then choose <b>Run / Preview</b> to see it. HTML previews run in a sandbox on this device.</span></li>
+          <li><strong>Analyze code online</strong><span>Configure your Cloudflare Worker URL in a code snippet. Analyze code sends only that code to Google Gemini; do not submit secrets or private code.</span></li>
           <li><strong>Keep things organized</strong><span>Add a language, project folder, and comma-separated tags. Use the sidebar to browse them.</span></li>
           <li><strong>Search your vault</strong><span>Use the search button or press <kbd>Ctrl</kbd> + <kbd>K</kbd> (⌘ + K on Mac) to search titles, code, tags, and folders.</span></li>
           <li><strong>Back up your work</strong><span>Use <b>Backup</b> to export JSON or Markdown. Entries stay in this browser on this device; import a JSON backup to move them elsewhere.</span></li>
@@ -238,7 +239,7 @@
           <div class="field-group" id="language-group">
             <label class="field-label" for="entry-language">Language</label>
             <input class="text-field" id="entry-language" name="language" type="text" maxlength="30" list="language-options" placeholder="e.g. TypeScript" />
-            <datalist id="language-options"><option value="C++"></option><option value="CSS"></option><option value="HTML"></option><option value="JavaScript"></option><option value="Markdown"></option><option value="Python"></option><option value="TypeScript"></option></datalist>
+            <datalist id="language-options"><option value="C++"></option><option value="CSS"></option><option value="HTML"></option><option value="Java"></option><option value="JavaScript"></option><option value="Markdown"></option><option value="Python"></option><option value="TypeScript"></option></datalist>
           </div>
         </div>
         <label class="field-label" for="entry-folder">Project folder <span class="label-hint">use / for nested folders</span></label>
@@ -252,6 +253,19 @@
           <span class="preview-description">Run HTML, CSS, JavaScript, Python, and TypeScript on this device. C++ is stored only.</span>
           <button class="preview-button" id="preview-button" type="button">Run / Preview <span aria-hidden="true">↗</span></button>
         </div>
+        <section class="analyzer-controls" aria-label="Online code analyzer">
+          <label class="field-label" for="analyzer-endpoint">Gemini analyzer Worker URL</label>
+          <div class="analyzer-endpoint-row">
+            <input class="text-field" id="analyzer-endpoint" type="url" inputmode="url" placeholder="https://your-worker.workers.dev" autocomplete="url" />
+            <button class="preview-button" id="save-analyzer-endpoint" type="button">Save URL</button>
+          </div>
+          <p class="analyzer-privacy-note">Only code you submit for analysis is sent to Google Gemini through your Worker. Do not submit passwords, API keys, or private code. Analysis may be incorrect.</p>
+          <div class="analyzer-action-row">
+            <span class="analyzer-status" id="analyzer-status" role="status" aria-live="polite">Supports C++, Python, Java, HTML, CSS, and JavaScript.</span>
+            <button class="preview-button analyzer-button" id="analyze-code-button" type="button" disabled>Analyze code <span aria-hidden="true">↗</span></button>
+          </div>
+          <pre class="playground-output analyzer-output is-hidden" id="analyzer-output" aria-live="polite"></pre>
+        </section>
         <section class="preview-panel is-hidden" id="preview-panel" aria-label="Entry preview">
           <div class="preview-panel-header"><span id="preview-label">LIVE PREVIEW</span><button class="preview-close" id="preview-close" type="button" aria-label="Close preview">×</button></div>
           <div class="markdown-preview is-hidden" id="markdown-preview"></div>

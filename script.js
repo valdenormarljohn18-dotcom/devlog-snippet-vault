@@ -1,7 +1,22 @@
 const STORAGE_KEY = "devlog-vault.entries.v1";
 const THEME_STORAGE_KEY = "devlog-vault.theme.v1";
+const ANALYZER_ENDPOINT_STORAGE_KEY = "devlog-vault.analyzer-endpoint.v1";
 const EXAMPLE_SEEDED_KEY = "devlog-vault.example-seeded.v1";
 const EXAMPLE_ENTRY_ID = "starter-example-simple-webpage";
+const ANALYZABLE_LANGUAGES = new Set([
+  "c++",
+  "cpp",
+  "c plus plus",
+  "python",
+  "python 3",
+  "python3",
+  "java",
+  "html",
+  "html5",
+  "css",
+  "js",
+  "javascript",
+]);
 const themes = {
   forest: { label: "Forest dark", color: "#111713" },
   midnight: { label: "Black & blue", color: "#090e18" },
@@ -25,6 +40,19 @@ function syncThemeChoices() {
   document.querySelectorAll("[data-theme-choice]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.themeChoice === activeTheme));
   });
+}
+
+function loadAnalyzerEndpoint() {
+  try {
+    return localStorage.getItem(ANALYZER_ENDPOINT_STORAGE_KEY) || "";
+  } catch (error) {
+    console.error("Could not read the saved analyzer URL.", error);
+    window.setTimeout(
+      () => showToast("The analyzer URL could not be read from this device."),
+      0,
+    );
+    return "";
+  }
 }
 
 function createExampleEntry() {
@@ -93,6 +121,10 @@ const elements = {
   emptyDescription: document.querySelector("#empty-description"),
   palette: document.querySelector("#palette-dialog"),
   guide: document.querySelector("#guide-dialog"),
+  analyzerEndpoint: document.querySelector("#analyzer-endpoint"),
+  analyzerStatus: document.querySelector("#analyzer-status"),
+  analyzerOutput: document.querySelector("#analyzer-output"),
+  analyzeButton: document.querySelector("#analyze-code-button"),
   paletteSearch: document.querySelector("#palette-search"),
   paletteResults: document.querySelector("#palette-results"),
   sort: document.querySelector("#sort-select"),
@@ -106,12 +138,186 @@ const elements = {
 };
 
 let entries = loadEntries();
+let analyzerEndpoint = loadAnalyzerEndpoint();
 let activeFilter = "all";
 let organizationFilter = null;
 let searchQuery = "";
 let selectedPaletteIndex = 0;
 let editingId = null;
 let toastTimer;
+let activeAnalysisController = null;
+elements.analyzerEndpoint.value = analyzerEndpoint;
+
+function normalizedAnalyzerLanguage(value) {
+  return value.trim().toLocaleLowerCase();
+}
+
+function isAnalyzableLanguage(value) {
+  return ANALYZABLE_LANGUAGES.has(normalizedAnalyzerLanguage(value));
+}
+
+function updateAnalyzerAvailability() {
+  const language = document.querySelector("#entry-language").value;
+  const code = document.querySelector("#entry-content").value.trim();
+  const isSnippet = document.querySelector("#entry-type").value === "snippet";
+  elements.analyzeButton.disabled =
+    !isSnippet || !code || code.length > 20000 || !isAnalyzableLanguage(language);
+}
+
+function clearAnalyzerResult() {
+  if (activeAnalysisController) {
+    activeAnalysisController.abort();
+    activeAnalysisController = null;
+  }
+  elements.analyzerOutput.textContent = "";
+  elements.analyzerOutput.classList.add("is-hidden");
+  elements.analyzerStatus.textContent = analyzerEndpoint
+    ? "Ready to analyze C++, Python, Java, HTML, CSS, or JavaScript."
+    : "Save your Cloudflare Worker URL to analyze C++, Python, Java, HTML, CSS, or JavaScript.";
+  updateAnalyzerAvailability();
+}
+
+function validateAnalyzerEndpoint(value) {
+  const endpoint = new URL(value);
+  const isLocalhost = ["localhost", "127.0.0.1"].includes(endpoint.hostname);
+  if (
+    (endpoint.protocol !== "https:" && !(endpoint.protocol === "http:" && isLocalhost)) ||
+    endpoint.username ||
+    endpoint.password ||
+    endpoint.search ||
+    endpoint.hash
+  ) {
+    throw new TypeError("Use an HTTPS Worker URL (HTTP is allowed only for localhost).");
+  }
+  return endpoint.toString().replace(/\/+$/, "");
+}
+
+function getAnalyzerRequestUrl() {
+  const endpoint = new URL(analyzerEndpoint);
+  if (!endpoint.pathname.endsWith("/analyze")) {
+    endpoint.pathname = `${endpoint.pathname.replace(/\/+$/, "")}/analyze`;
+  }
+  return endpoint.toString();
+}
+
+async function analyzeCurrentCode() {
+  const language = document.querySelector("#entry-language").value.trim();
+  const code = document.querySelector("#entry-content").value;
+
+  if (!analyzerEndpoint) {
+    elements.analyzerStatus.textContent =
+      "Save your deployed Cloudflare Worker URL above before analyzing.";
+    return;
+  }
+  if (!isAnalyzableLanguage(language)) {
+    elements.analyzerStatus.textContent =
+      "Choose C++, Python, Java, HTML, CSS, or JavaScript as the language.";
+    return;
+  }
+  if (!code.trim() || code.length > 20000) {
+    elements.analyzerStatus.textContent =
+      "Enter code up to 20,000 characters before analyzing.";
+    return;
+  }
+
+  clearAnalyzerResult();
+  const controller = new AbortController();
+  activeAnalysisController = controller;
+  elements.analyzeButton.disabled = true;
+  elements.analyzerOutput.classList.remove("is-hidden");
+  elements.analyzerOutput.textContent = "Sending the submitted code to Google Gemini for analysis...";
+  elements.analyzerStatus.textContent = "Analyzing. This can take a few seconds.";
+  const timeout = window.setTimeout(() => controller.abort(), 45000);
+
+  try {
+    const response = await fetch(getAnalyzerRequestUrl(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ language, code }),
+      signal: controller.signal,
+      redirect: "error",
+    });
+    let result;
+    try {
+      result = await response.json();
+    } catch (error) {
+      console.error("The analyzer Worker returned invalid JSON.", error);
+      throw new Error("The analyzer returned an invalid response. Check the Worker deployment.");
+    }
+    if (!response.ok) {
+      throw new Error(
+        typeof result.error === "string"
+          ? result.error
+          : `The analyzer request failed (${response.status}).`,
+      );
+    }
+    if (typeof result.analysis !== "string" || !result.analysis.trim()) {
+      throw new Error("The analyzer returned no results. Please try again.");
+    }
+    elements.analyzerOutput.textContent = result.analysis;
+    elements.analyzerStatus.textContent = "Analysis complete. Review suggestions before changing code.";
+  } catch (error) {
+    if (activeAnalysisController !== controller) return;
+    if (error.name === "AbortError") {
+      elements.analyzerStatus.textContent = "Analysis timed out or was cancelled. Please try again.";
+      elements.analyzerOutput.textContent = "No analysis was returned.";
+    } else {
+      console.error("Code analysis failed.", error);
+      elements.analyzerStatus.textContent = error.message || "Code analysis failed. Check your Worker URL and setup.";
+      elements.analyzerOutput.textContent = "Could not analyze this code.";
+    }
+  } finally {
+    window.clearTimeout(timeout);
+    if (activeAnalysisController === controller) {
+      activeAnalysisController = null;
+      updateAnalyzerAvailability();
+    }
+  }
+}
+
+document.querySelector("#save-analyzer-endpoint").addEventListener("click", () => {
+  const value = elements.analyzerEndpoint.value.trim();
+  if (!value) {
+    try {
+      localStorage.removeItem(ANALYZER_ENDPOINT_STORAGE_KEY);
+      analyzerEndpoint = "";
+      clearAnalyzerResult();
+      showToast("Analyzer Worker URL removed from this device.");
+    } catch (error) {
+      console.error("Could not remove the saved analyzer URL.", error);
+      showToast("Could not remove the analyzer URL from this device.");
+    }
+    return;
+  }
+  let validatedEndpoint;
+  try {
+    validatedEndpoint = validateAnalyzerEndpoint(value);
+  } catch (error) {
+    console.error("The analyzer Worker URL is invalid.", error);
+    elements.analyzerStatus.textContent = error.message;
+    showToast("Enter a valid HTTPS Worker URL.");
+    return;
+  }
+  try {
+    localStorage.setItem(ANALYZER_ENDPOINT_STORAGE_KEY, validatedEndpoint);
+    analyzerEndpoint = validatedEndpoint;
+    elements.analyzerEndpoint.value = validatedEndpoint;
+    clearAnalyzerResult();
+    showToast("Analyzer Worker URL saved on this device.");
+  } catch (error) {
+    console.error("Could not save the analyzer Worker URL.", error);
+    elements.analyzerStatus.textContent = "Could not save the Worker URL in browser storage.";
+    showToast("Could not save the analyzer URL. Check browser storage settings.");
+  }
+});
+
+elements.analyzeButton.addEventListener("click", analyzeCurrentCode);
+document.querySelector("#entry-language").addEventListener("input", clearAnalyzerResult);
+document.querySelector("#entry-content").addEventListener("input", clearAnalyzerResult);
+elements.analyzerStatus.textContent = analyzerEndpoint
+  ? "Ready to analyze C++, Python, Java, HTML, CSS, or JavaScript."
+  : "Save your Cloudflare Worker URL to analyze C++, Python, Java, HTML, CSS, or JavaScript.";
+
 function setTheme(theme) {
   if (!Object.hasOwn(themes, theme)) return;
   activeTheme = theme;
@@ -579,6 +785,7 @@ function openEntry(entry = null) {
       : "Write it down while it’s fresh...";
   elements.previewPanel.classList.add("is-hidden");
   elements.previewFrame.removeAttribute("srcdoc");
+  clearAnalyzerResult();
   elements.dialog.showModal();
   document.querySelector("#entry-title").focus();
 }
@@ -992,6 +1199,7 @@ document.querySelector("#entry-type").addEventListener("change", (event) => {
   document.querySelector("#entry-content").placeholder = isSnippet
     ? "Paste or write a useful piece of code..."
     : "Write it down while it’s fresh...";
+  updateAnalyzerAvailability();
 });
 
 elements.form.addEventListener("submit", (event) => {
