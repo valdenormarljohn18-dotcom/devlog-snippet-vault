@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "DevLog & Snippet Vault",
+  "short_name": "DevLog",
+  "description": "A local-first home for your code snippets and developer notes.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#111713",
+  "theme_color": "#111713",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

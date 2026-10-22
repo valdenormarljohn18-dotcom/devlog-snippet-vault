@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111713" />
+    <meta name="description" content="A local-first home for your code snippets and developer notes." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon.svg" />
+    <title>Devlog — your local code journal</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" href="#" aria-label="Devlog home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
+          <span>devlog<span class="brand-period">.</span></span>
+        </a>
+
+        <div class="workspace-label">YOUR WORKSPACE</div>
+        <nav class="primary-nav" aria-label="Collections">
+          <button class="nav-item is-active" type="button" data-filter="all">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"></rect><rect x="12" y="3" width="5" height="5" rx="1"></rect><rect x="3" y="12" width="5" height="5" rx="1"></rect><rect x="12" y="12" width="5" height="5" rx="1"></rect></svg>
+            <span>All entries</span><span class="nav-count" id="all-count">0</span>
+          </button>
+          <button class="nav-item" type="button" data-filter="log">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 15V5A1.5 1.5 0 0 1 5 3.5Z"></path><path d="M7 7h6M7 10h6M7 13h3"></path></svg>
+            <span>Dev logs</span><span class="nav-count" id="log-count">0</span>
+          </button>
+          <button class="nav-item" type="button" data-filter="snippet">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 5-5 5 5 5M13 5l5 5-5 5M11.5 3l-3 14"></path></svg>
+            <span>Snippets</span><span class="nav-count" id="snippet-count">0</span>
+          </button>
+          <button class="nav-item" type="button" data-filter="favorites">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m10 2.8 2.2 4.45 4.91.72-3.55 3.46.84 4.89L10 14.01l-4.4 2.31.84-4.89-3.55-3.46 4.91-.72L10 2.8Z"></path></svg>
+            <span>Favorites</span><span class="nav-count" id="favorite-count">0</span>
+          </button>
+        </nav>
+
+        <div class="library-tree">
+          <div class="tree-heading">LIBRARY</div>
+          <section class="tree-section" aria-label="Tech stack">
+            <div class="tree-section-title">TECH STACK</div>
+            <div id="language-tree" class="tree-list"></div>
+          </section>
+          <section class="tree-section" aria-label="Tags">
+            <div class="tree-section-title">TAGS</div>
+            <div id="tag-tree" class="tree-list"></div>
+          </section>
+          <section class="tree-section folder-tree-section" aria-label="Project folders">
+            <div class="tree-section-title">PROJECT MODULES</div>
+            <div id="folder-tree" class="tree-list"></div>
+          </section>
+          <p id="tree-empty" class="tree-empty">Add a language or folder to an entry to organize it here.</p>
+        </div>
+
+        <div class="sidebar-bottom">
+          <div class="local-note">
+            <span class="local-indicator"></span>
+            <div>
+              <strong>Local vault</strong>
+              <span>Stored on this device. Android: open the HTTPS app in Chrome, then choose ⋮ &gt; Install app.</span>
+            </div>
+          </div>
+          <div class="sidebar-footer">A quiet space for your work.</div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumb"><span>Workspace</span><span class="crumb-divider">/</span><strong id="current-section">All entries</strong></div>
+          <div class="topbar-actions">
+            <button class="new-entry-button" id="new-entry-button" type="button">
+              <span class="plus-icon" aria-hidden="true">+</span>
+              <span>New entry</span>
+              <kbd>N</kbd>
+            </button>
+            <details class="theme-menu">
+              <summary aria-label="Choose color theme" title="Choose color theme">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.7a7.3 7.3 0 1 0 0 14.6h1.05a1.7 1.7 0 0 0 1.2-2.9 1.1 1.1 0 0 1 .78-1.88h1.04A3.23 3.23 0 0 0 17.3 9.3 7.3 7.3 0 0 0 10 2.7Z"></path><circle cx="6.6" cy="9.1" r=".8"></circle><circle cx="9" cy="5.9" r=".8"></circle><circle cx="12.8" cy="6.8" r=".8"></circle></svg>
+                <span>Theme</span>
+              </summary>
+              <div class="theme-menu-popover" role="group" aria-label="Color themes">
+                <button type="button" class="theme-choice" data-theme-choice="forest" aria-pressed="false"><span class="theme-swatch swatch-forest"></span><span><strong>Forest dark</strong><small>Charcoal &amp; green</small></span><span class="theme-check" aria-hidden="true">✓</span></button>
+                <button type="button" class="theme-choice" data-theme-choice="midnight" aria-pressed="false"><span class="theme-swatch swatch-midnight"></span><span><strong>Black &amp; blue</strong><small>Midnight blue accents</small></span><span class="theme-check" aria-hidden="true">✓</span></button>
+                <button type="button" class="theme-choice" data-theme-choice="violet" aria-pressed="false"><span class="theme-swatch swatch-violet"></span><span><strong>White &amp; violet</strong><small>Light with violet accents</small></span><span class="theme-check" aria-hidden="true">✓</span></button>
+              </div>
+            </details>
+            <details class="export-menu">
+              <summary aria-label="Export or import your data">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.8v9.1m0 0 3.2-3.2M10 11.9 6.8 8.7M3.5 13.5v2.2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2.2"></path></svg>
+                <span>Backup</span>
+              </summary>
+              <div class="export-menu-popover">
+                <button type="button" id="share-vault">Share project backup (.json)</button>
+                <button type="button" id="export-json">Download JSON backup</button>
+                <button type="button" id="export-markdown">Export as Markdown</button>
+                <button type="button" id="import-json-trigger">Import JSON backup</button>
+                <input class="sr-only" id="import-json-file" type="file" accept="application/json,.json" />
+              </div>
+            </details>
+          </div>
+        </header>
+
+        <section class="content-area">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span> YOUR PERSONAL KNOWLEDGE BASE</div>
+              <h1 id="page-title">A little progress, <span>every day.</span></h1>
+              <p class="page-description">Keep the useful bits. Remember how you solved it.</p>
+            </div>
+            <div class="date-chip"><span class="date-dot"></span><span id="today-date"></span></div>
+          </div>
+
+          <section class="stats-grid" aria-label="Workspace summary">
+            <article class="stat-card">
+              <div class="stat-top"><span class="stat-label">TOTAL ENTRIES</span><span class="stat-icon icon-slate">⌘</span></div>
+              <div class="stat-value" id="total-stat">0</div>
+              <div class="stat-caption">Things worth remembering</div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span class="stat-label">DEV LOGS</span><span class="stat-icon icon-blue">↗</span></div>
+              <div class="stat-value" id="logs-stat">0</div>
+              <div class="stat-caption">Notes from the journey</div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span class="stat-label">CODE SNIPPETS</span><span class="stat-icon icon-violet">{ }</span></div>
+              <div class="stat-value" id="snippets-stat">0</div>
+              <div class="stat-caption">Small things, saved for later</div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span class="stat-label">STARRED</span><span class="stat-icon icon-amber">☆</span></div>
+              <div class="stat-value" id="favorites-stat">0</div>
+              <div class="stat-caption">Your personal highlights</div>
+            </article>
+          </section>
+
+          <section class="entries-section" aria-labelledby="entries-heading">
+            <div class="entries-header">
+              <div class="entries-title-wrap">
+                <div>
+                  <h2 id="entries-heading">Your entries</h2>
+                  <p class="entries-subtitle">A collection of what you’ve learned and built.</p>
+                </div>
+                <span class="result-count" id="result-count">0 entries</span>
+              </div>
+              <div class="toolbar">
+                <button class="palette-launch" id="open-palette-button" type="button">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8"></circle><path d="m13.2 13.2 4 4"></path></svg>
+                  <span>Search by title, code, tags...</span>
+                  <kbd>Ctrl / ⌘ K</kbd>
+                </button>
+                <label class="sort-control">
+                  <span class="sr-only">Sort entries</span>
+                  <select id="sort-select">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="az">Title A–Z</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="filter-row" aria-label="Filter entries">
+              <span class="filter-label">SHOWING</span>
+              <button class="filter-chip is-selected" type="button" data-filter="all">Everything</button>
+              <button class="filter-chip" type="button" data-filter="log">Dev logs</button>
+              <button class="filter-chip" type="button" data-filter="snippet">Snippets</button>
+            </div>
+
+            <div class="entries-grid" id="entries-grid" aria-live="polite"></div>
+            <div class="empty-state is-hidden" id="empty-state">
+              <div class="empty-illustration" aria-hidden="true"><span>{</span><span>…</span><span>}</span></div>
+              <h3 id="empty-title">A fresh page.</h3>
+              <p id="empty-description">Every good collection starts somewhere. Save a useful snippet or jot down what you learned today.</p>
+              <button class="new-entry-button empty-cta" id="empty-new-button" type="button"><span class="plus-icon" aria-hidden="true">+</span> Create your first entry</button>
+            </div>
+          </section>
+          <footer class="page-footer"><span><span class="footer-mark"></span> Made for the long game.</span><span>Developed by <strong class="developer-credit">Mr.Wipp</strong> <span class="footer-separator">·</span> Local-first by design</span></footer>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="palette-dialog" id="palette-dialog" aria-label="Search your vault">
+      <div class="palette-shell">
+        <div class="palette-search-row">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8"></circle><path d="m13.2 13.2 4 4"></path></svg>
+          <input id="palette-search" type="search" placeholder="Search snippets, languages, tags, folders..." autocomplete="off" aria-label="Search all entries" />
+          <kbd>ESC</kbd>
+        </div>
+        <div class="palette-hint">TYPE TO SEARCH <span>FUZZY MATCHING</span></div>
+        <div id="palette-results" class="palette-results" role="listbox" aria-label="Search results"></div>
+        <div class="palette-footer"><span>↑ ↓ to navigate</span><span>↵ open entry</span><span>ESC close</span></div>
+      </div>
+    </dialog>
+
+    <dialog class="entry-dialog" id="entry-dialog" aria-labelledby="dialog-title">
+      <form class="entry-form" id="entry-form">
+        <div class="dialog-header">
+          <div><span class="dialog-eyebrow">YOUR KNOWLEDGE BASE</span><h2 id="dialog-title">New entry</h2></div>
+          <button class="icon-button close-dialog" type="button" aria-label="Close dialog">×</button>
+        </div>
+        <label class="field-label" for="entry-title">Title</label>
+        <input class="text-field title-field" id="entry-title" name="title" type="text" maxlength="100" placeholder="Give this entry a name..." required />
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="entry-type">Entry type</label>
+            <select class="text-field" id="entry-type" name="type"><option value="log">Dev log</option><option value="snippet">Code snippet</option></select>
+          </div>
+          <div class="field-group" id="language-group">
+            <label class="field-label" for="entry-language">Language</label>
+            <input class="text-field" id="entry-language" name="language" type="text" maxlength="30" list="language-options" placeholder="e.g. TypeScript" />
+            <datalist id="language-options"><option value="C++"></option><option value="CSS"></option><option value="HTML"></option><option value="JavaScript"></option><option value="Markdown"></option><option value="Python"></option><option value="TypeScript"></option></datalist>
+          </div>
+        </div>
+        <label class="field-label" for="entry-folder">Project folder <span class="label-hint">use / for nested folders</span></label>
+        <input class="text-field" id="entry-folder" name="folder" type="text" maxlength="100" list="folder-options" placeholder="e.g. Website / Components" />
+        <datalist id="folder-options"></datalist>
+        <label class="field-label" for="entry-tags">Tags <span class="label-hint">comma separated</span></label>
+        <input class="text-field" id="entry-tags" name="tags" type="text" maxlength="120" placeholder="e.g. frontend, debugging" />
+        <label class="field-label" for="entry-content">Notes <span class="label-hint" id="content-hint">What did you learn?</span></label>
+        <textarea class="text-field content-field" id="entry-content" name="content" rows="8" placeholder="Write it down while it’s fresh..." required></textarea>
+        <div class="preview-toolbar">
+          <span class="preview-description">Run HTML, CSS, JavaScript, Python, and TypeScript on this device. C++ is stored only.</span>
+          <button class="preview-button" id="preview-button" type="button">Run / Preview <span aria-hidden="true">↗</span></button>
+        </div>
+        <section class="preview-panel is-hidden" id="preview-panel" aria-label="Entry preview">
+          <div class="preview-panel-header"><span id="preview-label">LIVE PREVIEW</span><button class="preview-close" id="preview-close" type="button" aria-label="Close preview">×</button></div>
+          <div class="markdown-preview is-hidden" id="markdown-preview"></div>
+          <pre class="playground-output is-hidden" id="playground-output" aria-live="polite"></pre>
+          <iframe class="playground-frame is-hidden" id="playground-frame" title="Sandboxed code preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
+        </section>
+        <div class="dialog-footer">
+          <button class="delete-entry-button is-hidden" id="delete-entry-button" type="button">Delete entry</button>
+          <div class="dialog-actions"><button class="cancel-button close-dialog" type="button">Cancel</button><button class="save-button" type="submit">Save entry <span aria-hidden="true">↗</span></button></div>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
