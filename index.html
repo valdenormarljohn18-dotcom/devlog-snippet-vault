@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#111713" />
-    <meta name="description" content="A local-first home for your code snippets and developer notes." /> <meta name="author" content="mr. Wipp" />
+    <meta name="description" content="A local-first home for your code snippets and developer notes." />
+    <meta name="author" content="mr. Wipp" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icons/icon.svg" />
@@ -22,19 +23,19 @@
 
         <div class="workspace-label">YOUR WORKSPACE</div>
         <nav class="primary-nav" aria-label="Collections">
-          <button class="nav-item is-active" type="button" data-filter="all">
+          <button class="nav-item is-active" type="button" data-filter="all" aria-label="All entries" title="All entries">
             <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"></rect><rect x="12" y="3" width="5" height="5" rx="1"></rect><rect x="3" y="12" width="5" height="5" rx="1"></rect><rect x="12" y="12" width="5" height="5" rx="1"></rect></svg>
             <span>All entries</span><span class="nav-count" id="all-count">0</span>
           </button>
-          <button class="nav-item" type="button" data-filter="log">
+          <button class="nav-item" type="button" data-filter="log" aria-label="Dev logs" title="Dev logs">
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 15V5A1.5 1.5 0 0 1 5 3.5Z"></path><path d="M7 7h6M7 10h6M7 13h3"></path></svg>
             <span>Dev logs</span><span class="nav-count" id="log-count">0</span>
           </button>
-          <button class="nav-item" type="button" data-filter="snippet">
+          <button class="nav-item" type="button" data-filter="snippet" aria-label="Code snippets" title="Code snippets">
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 5-5 5 5 5M13 5l5 5-5 5M11.5 3l-3 14"></path></svg>
-            <span>Snippets</span><span class="nav-count" id="snippet-count">0</span>
+            <span>Code snippets</span><span class="nav-count" id="snippet-count">0</span>
           </button>
-          <button class="nav-item" type="button" data-filter="favorites">
+          <button class="nav-item" type="button" data-filter="favorites" aria-label="Favorites" title="Favorites">
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m10 2.8 2.2 4.45 4.91.72-3.55 3.46.84 4.89L10 14.01l-4.4 2.31.84-4.89-3.55-3.46 4.91-.72L10 2.8Z"></path></svg>
             <span>Favorites</span><span class="nav-count" id="favorite-count">0</span>
           </button>
@@ -51,14 +52,14 @@
             <div id="tag-tree" class="tree-list"></div>
           </section>
           <section class="tree-section folder-tree-section" aria-label="Project folders">
-            <div class="tree-section-title">PROJECT MODULES</div>
+            <div class="tree-section-title">PROJECT FOLDERS</div>
             <div id="folder-tree" class="tree-list"></div>
           </section>
-          <p id="tree-empty" class="tree-empty">Add a language or folder to an entry to organize it here.</p>
+          <p id="tree-empty" class="tree-empty">Add a language, tag, or folder while saving an entry. Your collections will appear here.</p>
         </div>
 
         <div class="sidebar-bottom">
-          <div class="local-note">
+          <div class="local-note" title="Your entries stay in this browser on this device unless you export or share a backup.">
             <span class="local-indicator"></span>
             <div>
               <strong>Local vault</strong>
@@ -73,7 +74,7 @@
         <header class="topbar">
           <div class="breadcrumb"><span>Workspace</span><span class="crumb-divider">/</span><strong id="current-section">All entries</strong></div>
           <div class="topbar-actions">
-            <button class="guide-button" id="open-guide-button" type="button">Quick guide</button>
+            <button class="guide-button" id="open-guide-button" type="button" aria-label="Help and quick guide" title="Help and quick guide">Help</button>
             <button class="new-entry-button" id="new-entry-button" type="button">
               <span class="plus-icon" aria-hidden="true">+</span>
               <span>New entry</span>
@@ -151,7 +152,7 @@
               <div class="toolbar">
                 <button class="palette-launch" id="open-palette-button" type="button">
                   <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8"></circle><path d="m13.2 13.2 4 4"></path></svg>
-                  <span>Search by title, code, tags...</span>
+                  <span>Search entries...</span>
                   <kbd>Ctrl / ⌘ K</kbd>
                 </button>
                 <label class="sort-control">
@@ -169,7 +170,7 @@
               <span class="filter-label">SHOWING</span>
               <button class="filter-chip is-selected" type="button" data-filter="all">Everything</button>
               <button class="filter-chip" type="button" data-filter="log">Dev logs</button>
-              <button class="filter-chip" type="button" data-filter="snippet">Snippets</button>
+              <button class="filter-chip" type="button" data-filter="snippet">Code snippets</button>
             </div>
 
             <div class="entries-grid" id="entries-grid" aria-live="polite"></div>
@@ -202,19 +203,17 @@
       <div class="guide-content">
         <div class="guide-header">
           <div>
-            <span class="dialog-eyebrow">A QUICK TOUR</span>
-            <h2 id="guide-title">Make this vault yours.</h2>
-            <p>Save code and notes, find them quickly, and keep your own backup.</p>
+            <span class="dialog-eyebrow">GETTING STARTED</span>
+              <h2 id="guide-title">Your work stays on this device.</h2>
+              <p>Save a note or code snippet, then find it again whenever you need it.</p>
           </div>
           <button class="icon-button" id="close-guide-button" type="button" aria-label="Close guide">×</button>
         </div>
         <ol class="guide-steps">
-          <li><strong>Create an entry</strong><span>Choose <b>New entry</b>, then save a dev log for notes or a code snippet for something you want to reuse.</span></li>
+          <li><strong>Start with one entry</strong><span>Choose <b>New entry</b>, add a title, pick a dev log or code snippet, then write or paste. The other fields are optional.</span></li>
           <li><strong>Try the example webpage</strong><span>Open “Example: Simple welcome page” below, then choose <b>Run / Preview</b> to see it. HTML previews run in a sandbox on this device.</span></li>
-          <li><strong>Analyze code online</strong><span>Configure your Cloudflare Worker URL in a code snippet. Analyze code sends only that code to Google Gemini; do not submit secrets or private code.</span></li>
-          <li><strong>Keep things organized</strong><span>Add a language, project folder, and comma-separated tags. Use the sidebar to browse them.</span></li>
-          <li><strong>Search your vault</strong><span>Use the search button or press <kbd>Ctrl</kbd> + <kbd>K</kbd> (⌘ + K on Mac) to search titles, code, tags, and folders.</span></li>
-          <li><strong>Back up your work</strong><span>Use <b>Backup</b> to export JSON or Markdown. Entries stay in this browser on this device; import a JSON backup to move them elsewhere.</span></li>
+          <li><strong>Organize and find entries</strong><span>Language, folders, and tags are optional. Browse in the sidebar or search with <kbd>Ctrl</kbd> + <kbd>K</kbd> (⌘ + K on Mac).</span></li>
+          <li><strong>Your work stays private</strong><span>Entries stay in this browser on this device. Use <b>Backup</b> to export a copy. Online analysis sends only code you submit; never send secrets.</span></li>
         </ol>
         <div class="guide-actions">
           <button class="cancel-button" id="close-guide-footer" type="button">Got it</button>
@@ -226,46 +225,48 @@
     <dialog class="entry-dialog" id="entry-dialog" aria-labelledby="dialog-title">
       <form class="entry-form" id="entry-form">
         <div class="dialog-header">
-          <div><span class="dialog-eyebrow">YOUR KNOWLEDGE BASE</span><h2 id="dialog-title">New entry</h2></div>
+          <div><span class="dialog-eyebrow">YOUR KNOWLEDGE BASE</span><h2 id="dialog-title">New entry</h2><p class="entry-intro">Start with a title and your note or code. Everything else is optional.</p></div>
           <button class="icon-button close-dialog" type="button" aria-label="Close dialog">×</button>
         </div>
         <label class="field-label" for="entry-title">Title</label>
         <input class="text-field title-field" id="entry-title" name="title" type="text" maxlength="100" placeholder="Give this entry a name..." required />
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" for="entry-type">Entry type</label>
-            <select class="text-field" id="entry-type" name="type"><option value="log">Dev log</option><option value="snippet">Code snippet</option></select>
-          </div>
-          <div class="field-group" id="language-group">
-            <label class="field-label" for="entry-language">Language</label>
-            <input class="text-field" id="entry-language" name="language" type="text" maxlength="30" list="language-options" placeholder="e.g. TypeScript" />
-            <datalist id="language-options"><option value="C++"></option><option value="CSS"></option><option value="HTML"></option><option value="Java"></option><option value="JavaScript"></option><option value="Markdown"></option><option value="Python"></option><option value="TypeScript"></option></datalist>
-          </div>
-        </div>
-        <label class="field-label" for="entry-folder">Project folder <span class="label-hint">use / for nested folders</span></label>
-        <input class="text-field" id="entry-folder" name="folder" type="text" maxlength="100" list="folder-options" placeholder="e.g. Website / Components" />
-        <datalist id="folder-options"></datalist>
-        <label class="field-label" for="entry-tags">Tags <span class="label-hint">comma separated</span></label>
-        <input class="text-field" id="entry-tags" name="tags" type="text" maxlength="120" placeholder="e.g. frontend, debugging" />
-        <label class="field-label" for="entry-content">Notes <span class="label-hint" id="content-hint">What did you learn?</span></label>
+        <label class="field-label" for="entry-type">What are you saving?</label>
+        <select class="text-field" id="entry-type" name="type"><option value="log">A dev log or note</option><option value="snippet">A code snippet</option></select>
+        <label class="field-label" for="entry-content"><span id="content-label">Your note</span> <span class="label-hint" id="content-hint">What did you learn?</span></label>
         <textarea class="text-field content-field" id="entry-content" name="content" rows="8" placeholder="Write it down while it’s fresh..." required></textarea>
+        <details class="entry-options" id="entry-options">
+          <summary>Organize this entry <span>(optional)</span></summary>
+          <div class="entry-options-content">
+            <label class="field-label" for="entry-language">Language</label>
+            <input class="text-field" id="entry-language" name="language" type="text" maxlength="30" list="language-options" placeholder="e.g. HTML, Python, JavaScript" />
+            <datalist id="language-options"><option value="C++"></option><option value="CSS"></option><option value="HTML"></option><option value="Java"></option><option value="JavaScript"></option><option value="Markdown"></option><option value="Python"></option><option value="TypeScript"></option></datalist>
+            <label class="field-label" for="entry-folder">Project folder <span class="label-hint">use / for subfolders</span></label>
+            <input class="text-field" id="entry-folder" name="folder" type="text" maxlength="100" list="folder-options" placeholder="e.g. Website / Components" />
+            <datalist id="folder-options"></datalist>
+            <label class="field-label" for="entry-tags">Tags <span class="label-hint">separate with commas</span></label>
+            <input class="text-field" id="entry-tags" name="tags" type="text" maxlength="120" placeholder="e.g. frontend, debugging" />
+          </div>
+        </details>
         <div class="preview-toolbar">
-          <span class="preview-description">Run HTML, CSS, JavaScript, Python, and TypeScript on this device. C++ is stored only.</span>
-          <button class="preview-button" id="preview-button" type="button">Run / Preview <span aria-hidden="true">↗</span></button>
+          <span class="preview-description" id="preview-description">Preview your note before saving.</span>
+          <button class="preview-button" id="preview-button" type="button">Preview note <span aria-hidden="true">↗</span></button>
         </div>
-        <section class="analyzer-controls" aria-label="Online code analyzer">
-          <label class="field-label" for="analyzer-endpoint">Gemini analyzer Worker URL</label>
-          <div class="analyzer-endpoint-row">
-            <input class="text-field" id="analyzer-endpoint" type="url" inputmode="url" placeholder="https://your-worker.workers.dev" autocomplete="url" />
-            <button class="preview-button" id="save-analyzer-endpoint" type="button">Save URL</button>
-          </div>
-          <p class="analyzer-privacy-note">Only code you submit for analysis is sent to Google Gemini through your Worker. Do not submit passwords, API keys, or private code. Analysis may be incorrect.</p>
-          <div class="analyzer-action-row">
-            <span class="analyzer-status" id="analyzer-status" role="status" aria-live="polite">Supports C++, Python, Java, HTML, CSS, and JavaScript.</span>
-            <button class="preview-button analyzer-button" id="analyze-code-button" type="button" disabled>Analyze code <span aria-hidden="true">↗</span></button>
-          </div>
-          <pre class="playground-output analyzer-output is-hidden" id="analyzer-output" aria-live="polite"></pre>
-        </section>
+        <details class="analyzer-disclosure">
+          <summary>Optional: online code review</summary>
+          <section class="analyzer-controls" aria-label="Online code analyzer">
+            <label class="field-label" for="analyzer-endpoint">Your Cloudflare Worker URL</label>
+            <div class="analyzer-endpoint-row">
+              <input class="text-field" id="analyzer-endpoint" type="url" inputmode="url" placeholder="https://your-worker.workers.dev" autocomplete="url" />
+              <button class="preview-button" id="save-analyzer-endpoint" type="button">Save URL</button>
+            </div>
+            <p class="analyzer-privacy-note">Only code you submit for analysis is sent to Google Gemini through your Worker. Never submit passwords, API keys, or private code. AI suggestions can be wrong.</p>
+            <div class="analyzer-action-row">
+              <span class="analyzer-status" id="analyzer-status" role="status" aria-live="polite">Supports C++, Python, Java, HTML, CSS, and JavaScript.</span>
+              <button class="preview-button analyzer-button" id="analyze-code-button" type="button" disabled>Analyze code <span aria-hidden="true">↗</span></button>
+            </div>
+            <pre class="playground-output analyzer-output is-hidden" id="analyzer-output" aria-live="polite"></pre>
+          </section>
+        </details>
         <section class="preview-panel is-hidden" id="preview-panel" aria-label="Entry preview">
           <div class="preview-panel-header"><span id="preview-label">LIVE PREVIEW</span><button class="preview-close" id="preview-close" type="button" aria-label="Close preview">×</button></div>
           <div class="markdown-preview is-hidden" id="markdown-preview"></div>

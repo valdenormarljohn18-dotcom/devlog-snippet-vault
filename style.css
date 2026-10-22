@@ -1413,7 +1413,14 @@ h1 span {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
+}
+
+.entry-intro {
+  margin: 7px 0 0;
+  color: #849087;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .dialog-eyebrow {
@@ -1445,6 +1452,65 @@ h1 span {
   color: #59655e;
   font-size: 11px;
   font-weight: 600;
+}
+
+.entry-options,
+.analyzer-disclosure {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid #e5eae6;
+  border-radius: 7px;
+  background: #fafcfa;
+}
+
+.entry-options > summary,
+.analyzer-disclosure > summary {
+  min-height: 42px;
+  padding: 13px 12px;
+  color: #59665d;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.entry-options > summary::-webkit-details-marker,
+.analyzer-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.entry-options > summary::after,
+.analyzer-disclosure > summary::after {
+  float: right;
+  color: #8a988d;
+  content: "+";
+  font-size: 15px;
+  line-height: 12px;
+}
+
+.entry-options[open] > summary::after,
+.analyzer-disclosure[open] > summary::after {
+  content: "−";
+}
+
+.entry-options > summary span {
+  color: #929c94;
+  font-weight: 400;
+}
+
+.entry-options-content {
+  padding: 0 12px 12px;
+}
+
+.entry-options-content .field-label:first-child {
+  margin-top: 0;
+}
+
+.analyzer-disclosure .analyzer-controls {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid #e5eae6;
+  border-radius: 0;
 }
 
 .label-hint {
@@ -2224,6 +2290,8 @@ html[data-theme="midnight"] .palette-launch,
 html[data-theme="midnight"] .theme-menu summary,
 html[data-theme="midnight"] .export-menu summary,
 html[data-theme="midnight"] .guide-button,
+html[data-theme="midnight"] .entry-options,
+html[data-theme="midnight"] .analyzer-disclosure,
 html[data-theme="midnight"] .entry-dialog,
 html[data-theme="midnight"] .palette-dialog,
 html[data-theme="midnight"] .text-field,
@@ -2292,6 +2360,28 @@ html[data-theme="midnight"] .guide-button:hover {
 html[data-theme="midnight"] .guide-header h2,
 html[data-theme="midnight"] .guide-steps strong {
   color: #e1e9e2;
+}
+
+html[data-theme="midnight"] .entry-intro,
+html[data-theme="midnight"] .entry-options > summary,
+html[data-theme="midnight"] .analyzer-disclosure > summary {
+  color: #a5b5cb;
+}
+
+html[data-theme="midnight"] .entry-options,
+html[data-theme="midnight"] .analyzer-disclosure {
+  border-color: #30415a;
+  background: #141e2c;
+}
+
+html[data-theme="midnight"] .entry-options > summary::after,
+html[data-theme="midnight"] .analyzer-disclosure > summary::after,
+html[data-theme="midnight"] .entry-options > summary span {
+  color: #9cacc0;
+}
+
+html[data-theme="midnight"] .analyzer-disclosure .analyzer-controls {
+  border-color: #30415a;
 }
 
 html[data-theme="midnight"] .guide-header p,
@@ -2609,6 +2699,8 @@ html[data-theme="violet"] .palette-launch,
 html[data-theme="violet"] .theme-menu summary,
 html[data-theme="violet"] .export-menu summary,
 html[data-theme="violet"] .guide-button,
+html[data-theme="violet"] .entry-options,
+html[data-theme="violet"] .analyzer-disclosure,
 html[data-theme="violet"] .entry-dialog,
 html[data-theme="violet"] .palette-dialog,
 html[data-theme="violet"] .text-field,
@@ -2683,6 +2775,28 @@ html[data-theme="violet"] .guide-button:hover {
 html[data-theme="violet"] .guide-header h2,
 html[data-theme="violet"] .guide-steps strong {
   color: #4a4057;
+}
+
+html[data-theme="violet"] .entry-intro,
+html[data-theme="violet"] .entry-options > summary,
+html[data-theme="violet"] .analyzer-disclosure > summary {
+  color: #82798e;
+}
+
+html[data-theme="violet"] .entry-options,
+html[data-theme="violet"] .analyzer-disclosure {
+  border-color: #e7e1ee;
+  background: #f7f4fa;
+}
+
+html[data-theme="violet"] .entry-options > summary::after,
+html[data-theme="violet"] .analyzer-disclosure > summary::after,
+html[data-theme="violet"] .entry-options > summary span {
+  color: #8e849b;
+}
+
+html[data-theme="violet"] .analyzer-disclosure .analyzer-controls {
+  border-color: #e7e1ee;
 }
 
 html[data-theme="violet"] .guide-header p,
@@ -3579,5 +3693,24 @@ html[data-theme="violet"] .playground-output {
 
   .content-field {
     min-height: 135px;
+  }
+}
+
+@media (max-width: 760px) {
+  .guide-button,
+  .new-entry-button,
+  .export-menu summary,
+  .theme-menu summary,
+  .palette-launch,
+  .save-button,
+  .cancel-button,
+  .preview-button {
+    min-height: 42px;
+  }
+
+  .entry-dialog {
+    width: min(560px, calc(100% - 18px));
+    max-height: calc(100dvh - 18px);
+    border-radius: 10px;
   }
 }

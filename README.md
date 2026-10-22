@@ -2,7 +2,7 @@
 
 A local-first code and note vault. Entries are saved in the current browser on the current device. The app does not sync entries to a server. The optional online analyzer sends only code explicitly submitted for analysis to Google Gemini through the user's configured Cloudflare Worker.
 
-The first empty vault includes an editable HTML webpage example. Open **Quick guide** in the app for a short tour of entries, previews, organization, search, and backups. Deleting the example does not cause it to be added again.
+The first empty vault includes an editable HTML webpage example. A getting-started guide appears on the first visit and can be reopened with **Help**. Entries need only a title and notes or code; language, folders, tags, and online code review are optional. Deleting the example does not cause it to be added again.
 
 ## Publish on GitHub Pages
 

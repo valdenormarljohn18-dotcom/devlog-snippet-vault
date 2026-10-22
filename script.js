@@ -1,6 +1,7 @@
 const STORAGE_KEY = "devlog-vault.entries.v1";
 const THEME_STORAGE_KEY = "devlog-vault.theme.v1";
 const ANALYZER_ENDPOINT_STORAGE_KEY = "devlog-vault.analyzer-endpoint.v1";
+const ONBOARDING_STORAGE_KEY = "devlog-vault.onboarding-seen.v1";
 const EXAMPLE_SEEDED_KEY = "devlog-vault.example-seeded.v1";
 const EXAMPLE_ENTRY_ID = "starter-example-simple-webpage";
 const ANALYZABLE_LANGUAGES = new Set([
@@ -16,6 +17,19 @@ const ANALYZABLE_LANGUAGES = new Set([
   "css",
   "js",
   "javascript",
+]);
+const PREVIEWABLE_LANGUAGES = new Set([
+  "html",
+  "html5",
+  "css",
+  "js",
+  "javascript",
+  "py",
+  "python",
+  "python 3",
+  "python3",
+  "ts",
+  "typescript",
 ]);
 const themes = {
   forest: { label: "Forest dark", color: "#111713" },
@@ -162,6 +176,63 @@ function updateAnalyzerAvailability() {
   const isSnippet = document.querySelector("#entry-type").value === "snippet";
   elements.analyzeButton.disabled =
     !isSnippet || !code || code.length > 20000 || !isAnalyzableLanguage(language);
+}
+
+function updateEntryTypeGuidance() {
+  const isSnippet = document.querySelector("#entry-type").value === "snippet";
+  document.querySelector("#content-label").textContent = isSnippet ? "Your code" : "Your note";
+  document.querySelector("#content-hint").textContent = isSnippet
+    ? "Paste code you want to keep."
+    : "What did you learn?";
+  document.querySelector("#entry-content").placeholder = isSnippet
+    ? "Paste or write a useful piece of code..."
+    : "Write it down while it’s fresh...";
+  document.querySelector("#preview-button").innerHTML = isSnippet
+    ? 'Run / Preview <span aria-hidden="true">↗</span>'
+    : 'Preview note <span aria-hidden="true">↗</span>';
+  updatePreviewGuidance();
+  updateAnalyzerAvailability();
+}
+
+function updatePreviewGuidance() {
+  const isSnippet = document.querySelector("#entry-type").value === "snippet";
+  const language = document.querySelector("#entry-language").value.trim().toLocaleLowerCase();
+  const usesDownloadedRuntime = [
+    "py",
+    "python",
+    "python 3",
+    "python3",
+    "ts",
+    "typescript",
+  ].includes(language);
+  document.querySelector("#preview-description").textContent = !isSnippet
+    ? "Preview your note before saving."
+    : !language
+      ? "Choose a language under Organize to check local preview support."
+      : PREVIEWABLE_LANGUAGES.has(language)
+        ? usesDownloadedRuntime
+          ? "Runs in this browser; first use needs an internet connection to load the language runtime."
+          : "Previews in a sandbox on this device."
+        : `Saved on this device; a local preview is not available for ${language}.`;
+}
+
+function shouldShowOnboarding() {
+  try {
+    return localStorage.getItem(ONBOARDING_STORAGE_KEY) !== "seen";
+  } catch (error) {
+    console.error("Could not check whether the getting-started guide was seen.", error);
+    window.setTimeout(() => showToast("The welcome guide could not be remembered on this device."), 0);
+    return false;
+  }
+}
+
+function rememberOnboarding() {
+  try {
+    localStorage.setItem(ONBOARDING_STORAGE_KEY, "seen");
+  } catch (error) {
+    console.error("Could not remember that the getting-started guide was seen.", error);
+    showToast("The welcome guide could not be remembered on this device.");
+  }
 }
 
 function clearAnalyzerResult() {
@@ -312,7 +383,10 @@ document.querySelector("#save-analyzer-endpoint").addEventListener("click", () =
 });
 
 elements.analyzeButton.addEventListener("click", analyzeCurrentCode);
-document.querySelector("#entry-language").addEventListener("input", clearAnalyzerResult);
+document.querySelector("#entry-language").addEventListener("input", () => {
+  clearAnalyzerResult();
+  updatePreviewGuidance();
+});
 document.querySelector("#entry-content").addEventListener("input", clearAnalyzerResult);
 elements.analyzerStatus.textContent = analyzerEndpoint
   ? "Ready to analyze C++, Python, Java, HTML, CSS, or JavaScript."
@@ -717,7 +791,7 @@ function render() {
   const sectionNames = {
     all: "All entries",
     log: "Dev logs",
-    snippet: "Snippets",
+    snippet: "Code snippets",
     favorites: "Favorites",
   };
   const section = sectionNames[activeFilter];
@@ -772,17 +846,15 @@ function openEntry(entry = null) {
   document.querySelector("#dialog-title").textContent = entry ? "Edit entry" : "New entry";
   document.querySelector("#entry-title").value = entry ? entry.title : "";
   document.querySelector("#entry-type").value = entry ? entry.type : "log";
+  document.querySelector("#entry-options").open =
+    Boolean(entry && (entry.language || entry.folder || entry.tags?.length));
+  document.querySelector(".analyzer-disclosure").open = false;
   document.querySelector("#entry-language").value = entry ? entry.language || "" : "";
   document.querySelector("#entry-folder").value = entry ? entry.folder || "" : "";
   document.querySelector("#entry-tags").value = entry && Array.isArray(entry.tags) ? entry.tags.join(", ") : "";
   document.querySelector("#entry-content").value = entry ? entry.content : "";
   document.querySelector("#delete-entry-button").classList.toggle("is-hidden", !entry);
-  document.querySelector("#content-hint").textContent =
-    entry && entry.type === "snippet" ? "Your code, ready to reuse." : "What did you learn?";
-  document.querySelector("#entry-content").placeholder =
-    entry && entry.type === "snippet"
-      ? "Paste or write a useful piece of code..."
-      : "Write it down while it’s fresh...";
+  updateEntryTypeGuidance();
   elements.previewPanel.classList.add("is-hidden");
   elements.previewFrame.removeAttribute("srcdoc");
   clearAnalyzerResult();
@@ -1167,16 +1239,22 @@ document.querySelector("#open-guide-button").addEventListener("click", () => {
   elements.guide.showModal();
 });
 document.querySelector("#close-guide-button").addEventListener("click", () => {
+  rememberOnboarding();
   elements.guide.close();
 });
 document.querySelector("#close-guide-footer").addEventListener("click", () => {
+  rememberOnboarding();
   elements.guide.close();
 });
 elements.guide.addEventListener("click", (event) => {
-  if (event.target === elements.guide) elements.guide.close();
+  if (event.target === elements.guide) {
+    rememberOnboarding();
+    elements.guide.close();
+  }
 });
 document.querySelector("#try-example-button").addEventListener("click", () => {
   const example = entries.find((entry) => entry.id === EXAMPLE_ENTRY_ID);
+  rememberOnboarding();
   elements.guide.close();
   if (example) {
     openEntry(example);
@@ -1184,6 +1262,7 @@ document.querySelector("#try-example-button").addEventListener("click", () => {
     showToast("The example was deleted. Create a new HTML snippet to try the preview.");
   }
 });
+elements.guide.addEventListener("cancel", rememberOnboarding);
 document.querySelectorAll(".close-dialog").forEach((button) => {
   button.addEventListener("click", closeEntry);
 });
@@ -1191,16 +1270,7 @@ elements.dialog.addEventListener("click", (event) => {
   if (event.target === elements.dialog) closeEntry();
 });
 
-document.querySelector("#entry-type").addEventListener("change", (event) => {
-  const isSnippet = event.target.value === "snippet";
-  document.querySelector("#content-hint").textContent = isSnippet
-    ? "Your code, ready to reuse."
-    : "What did you learn?";
-  document.querySelector("#entry-content").placeholder = isSnippet
-    ? "Paste or write a useful piece of code..."
-    : "Write it down while it’s fresh...";
-  updateAnalyzerAvailability();
-});
+document.querySelector("#entry-type").addEventListener("change", updateEntryTypeGuidance);
 
 elements.form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -1379,3 +1449,8 @@ document.addEventListener("keydown", (event) => {
 });
 
 render();
+if (shouldShowOnboarding()) {
+  window.setTimeout(() => {
+    if (!elements.guide.open && !elements.dialog.open) elements.guide.showModal();
+  }, 250);
+}
