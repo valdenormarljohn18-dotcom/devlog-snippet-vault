@@ -1,0 +1,20 @@
+{
+  "$schema": "https://developers.cloudflare.com/workers/wrangler/configuration/schema.json",
+  "name": "devlog-snippet-analyzer",
+  "main": "analyzer-worker.js",
+  "compatibility_date": "2026-10-22",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://valdenormarljohn18-dotcom.github.io,http://localhost:8000"
+  },
+  "ratelimits": [
+    {
+      "name": "ANALYZE_LIMITER",
+      "namespace_id": "42582026",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ]
+}
