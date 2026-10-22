@@ -1,4 +1,4 @@
-const MAX_BODY_BYTES = 26000;
+const MAX_BODY_BYTES = 125000;
 const MAX_CODE_LENGTH = 20000;
 const GEMINI_MODEL = "gemini-2.5-flash";
 const SUPPORTED_LANGUAGES = new Set([
