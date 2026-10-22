@@ -2,6 +2,8 @@
 
 A local-first code and note vault. Entries are saved in the current browser on the current device. The app does not sync entries to a server.
 
+The first empty vault includes an editable HTML webpage example. Open **Quick guide** in the app for a short tour of entries, previews, organization, search, and backups. Deleting the example does not cause it to be added again.
+
 ## Publish on GitHub Pages
 
 1. Create a GitHub repository. If your account does not include Pages for private repositories, make it public.

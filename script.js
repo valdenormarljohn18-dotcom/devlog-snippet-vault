@@ -1,5 +1,7 @@
 const STORAGE_KEY = "devlog-vault.entries.v1";
 const THEME_STORAGE_KEY = "devlog-vault.theme.v1";
+const EXAMPLE_SEEDED_KEY = "devlog-vault.example-seeded.v1";
+const EXAMPLE_ENTRY_ID = "starter-example-simple-webpage";
 const themes = {
   forest: { label: "Forest dark", color: "#111713" },
   midnight: { label: "Black & blue", color: "#090e18" },
@@ -25,6 +27,57 @@ function syncThemeChoices() {
   });
 }
 
+function createExampleEntry() {
+  return {
+    id: EXAMPLE_ENTRY_ID,
+    type: "snippet",
+    title: "Example: Simple welcome page",
+    content: `<main class="welcome-card">
+  <p class="eyebrow">MY FIRST WEB PAGE</p>
+  <h1>Hello, web!</h1>
+  <p>This little page is saved in my local code vault.</p>
+  <button id="hello-button" type="button">Say hello</button>
+  <p id="message" aria-live="polite"></p>
+</main>
+
+<style>
+  body {
+    min-height: 100vh;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    background: #eef4ff;
+    color: #17243b;
+  }
+  .welcome-card {
+    width: min(360px, calc(100% - 40px));
+    padding: 32px;
+    border: 1px solid #d8e3f5;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 16px 45px #2038641c;
+    text-align: center;
+  }
+  .eyebrow { color: #5578b8; font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+  h1 { margin: 12px 0; font-size: 36px; }
+  button { padding: 10px 16px; border: 0; border-radius: 8px; background: #3267c8; color: white; cursor: pointer; }
+  #message { min-height: 24px; color: #3267c8; }
+</style>
+
+<script>
+  document.querySelector("#hello-button").addEventListener("click", () => {
+    document.querySelector("#message").textContent = "Nice work — you made this!";
+  });
+</script>`,
+    language: "HTML",
+    folder: "Web projects/Starter page",
+    tags: ["example", "beginner", "web"],
+    favorite: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 const starterEntries = [];
 const sampleEntryIds = new Set([
   "starter-log-css-grid",
@@ -39,6 +92,7 @@ const elements = {
   emptyTitle: document.querySelector("#empty-title"),
   emptyDescription: document.querySelector("#empty-description"),
   palette: document.querySelector("#palette-dialog"),
+  guide: document.querySelector("#guide-dialog"),
   paletteSearch: document.querySelector("#palette-search"),
   paletteResults: document.querySelector("#palette-results"),
   sort: document.querySelector("#sort-select"),
@@ -86,14 +140,16 @@ function loadEntries() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === null) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(starterEntries));
-      return starterEntries;
+      const initialEntries = [createExampleEntry()];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialEntries));
+      localStorage.setItem(EXAMPLE_SEEDED_KEY, "true");
+      return initialEntries;
     }
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed)) {
       throw new TypeError("Saved entries must be an array.");
     }
-    return parsed
+    const loadedEntries = parsed
       .filter(
         (entry) =>
           entry &&
@@ -112,6 +168,14 @@ function loadEntries() {
           : [],
         favorite: Boolean(entry.favorite),
       }));
+    if (localStorage.getItem(EXAMPLE_SEEDED_KEY) === null) {
+      if (loadedEntries.length === 0) {
+        loadedEntries.push(createExampleEntry());
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(loadedEntries));
+      }
+      localStorage.setItem(EXAMPLE_SEEDED_KEY, "true");
+    }
+    return loadedEntries;
   } catch (error) {
     console.error("Could not read saved Devlog entries.", error);
     window.setTimeout(
@@ -892,6 +956,27 @@ document.querySelector("#tag-tree").addEventListener("click", (event) => {
 
 document.querySelector("#new-entry-button").addEventListener("click", () => openEntry());
 document.querySelector("#empty-new-button").addEventListener("click", () => openEntry());
+document.querySelector("#open-guide-button").addEventListener("click", () => {
+  elements.guide.showModal();
+});
+document.querySelector("#close-guide-button").addEventListener("click", () => {
+  elements.guide.close();
+});
+document.querySelector("#close-guide-footer").addEventListener("click", () => {
+  elements.guide.close();
+});
+elements.guide.addEventListener("click", (event) => {
+  if (event.target === elements.guide) elements.guide.close();
+});
+document.querySelector("#try-example-button").addEventListener("click", () => {
+  const example = entries.find((entry) => entry.id === EXAMPLE_ENTRY_ID);
+  elements.guide.close();
+  if (example) {
+    openEntry(example);
+  } else {
+    showToast("The example was deleted. Create a new HTML snippet to try the preview.");
+  }
+});
 document.querySelectorAll(".close-dialog").forEach((button) => {
   button.addEventListener("click", closeEntry);
 });

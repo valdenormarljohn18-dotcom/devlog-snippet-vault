@@ -73,6 +73,7 @@
         <header class="topbar">
           <div class="breadcrumb"><span>Workspace</span><span class="crumb-divider">/</span><strong id="current-section">All entries</strong></div>
           <div class="topbar-actions">
+            <button class="guide-button" id="open-guide-button" type="button">Quick guide</button>
             <button class="new-entry-button" id="new-entry-button" type="button">
               <span class="plus-icon" aria-hidden="true">+</span>
               <span>New entry</span>
@@ -194,6 +195,30 @@
         <div class="palette-hint">TYPE TO SEARCH <span>FUZZY MATCHING</span></div>
         <div id="palette-results" class="palette-results" role="listbox" aria-label="Search results"></div>
         <div class="palette-footer"><span>↑ ↓ to navigate</span><span>↵ open entry</span><span>ESC close</span></div>
+      </div>
+    </dialog>
+
+    <dialog class="palette-dialog guide-dialog" id="guide-dialog" aria-labelledby="guide-title">
+      <div class="guide-content">
+        <div class="guide-header">
+          <div>
+            <span class="dialog-eyebrow">A QUICK TOUR</span>
+            <h2 id="guide-title">Make this vault yours.</h2>
+            <p>Save code and notes, find them quickly, and keep your own backup.</p>
+          </div>
+          <button class="icon-button" id="close-guide-button" type="button" aria-label="Close guide">×</button>
+        </div>
+        <ol class="guide-steps">
+          <li><strong>Create an entry</strong><span>Choose <b>New entry</b>, then save a dev log for notes or a code snippet for something you want to reuse.</span></li>
+          <li><strong>Try the example webpage</strong><span>Open “Example: Simple welcome page” below, then choose <b>Run / Preview</b> to see it. HTML previews run in a sandbox on this device.</span></li>
+          <li><strong>Keep things organized</strong><span>Add a language, project folder, and comma-separated tags. Use the sidebar to browse them.</span></li>
+          <li><strong>Search your vault</strong><span>Use the search button or press <kbd>Ctrl</kbd> + <kbd>K</kbd> (⌘ + K on Mac) to search titles, code, tags, and folders.</span></li>
+          <li><strong>Back up your work</strong><span>Use <b>Backup</b> to export JSON or Markdown. Entries stay in this browser on this device; import a JSON backup to move them elsewhere.</span></li>
+        </ol>
+        <div class="guide-actions">
+          <button class="cancel-button" id="close-guide-footer" type="button">Got it</button>
+          <button class="save-button" id="try-example-button" type="button">Open the example <span aria-hidden="true">↗</span></button>
+        </div>
       </div>
     </dialog>
 
